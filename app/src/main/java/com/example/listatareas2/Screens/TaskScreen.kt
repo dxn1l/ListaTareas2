@@ -4,7 +4,9 @@ import android.content.Context
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -17,17 +19,15 @@ import com.example.listatareas2.R
 import com.example.listatareas2.ui.theme.azulClarito
 
 @Composable
-fun TaskScreen(context: Context, navigateToPending: () -> Unit, navigateToCompleted: () -> Unit) {
+fun TaskScreen(context: Context, navigateToPending: () -> Unit, navigateToCompleted: () -> Unit, navigateToAddTask: () -> Unit, navigateToTaskDetails: (Int) -> Unit) {
     val dbHelper = TaskDatabaseHelper(context)
     var tasks by remember { mutableStateOf(dbHelper.getAllTasks()) }
-    var showDialog by remember { mutableStateOf(false) }
-    var taskTitle by remember { mutableStateOf("") }
 
     Column(
         modifier = Modifier.padding(16.dp)
     ) {
         Button(
-            onClick = { showDialog = true },
+            onClick = navigateToAddTask,
             modifier = Modifier.align(Alignment.CenterHorizontally),
             colors = ButtonDefaults.buttonColors(
                 containerColor = azulClarito
@@ -54,6 +54,14 @@ fun TaskScreen(context: Context, navigateToPending: () -> Unit, navigateToComple
                         ) {
                             Text(task.title ?: "")
                             Row {
+                                IconButton(
+                                    onClick = { navigateToTaskDetails(task.id) },
+                                    colors = IconButtonDefaults.iconButtonColors(
+                                        contentColor = azulClarito
+                                    )
+                                ) {
+                                    Icon(Icons.Filled.Info, contentDescription = stringResource(R.string.details))
+                                }
                                 Checkbox(
                                     checked = task.done,
                                     onCheckedChange = {
@@ -66,16 +74,16 @@ fun TaskScreen(context: Context, navigateToPending: () -> Unit, navigateToComple
                                         checkedColor = azulClarito
                                     )
                                 )
-                                Button(
+                                IconButton(
                                     onClick = {
                                         dbHelper.deleteTask(task.id)
                                         tasks = dbHelper.getAllTasks()
                                     },
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = azulClarito
+                                    colors = IconButtonDefaults.iconButtonColors(
+                                        contentColor = azulClarito
                                     )
                                 ) {
-                                    Text(stringResource(R.string.delete))
+                                    Icon(Icons.Filled.Delete, contentDescription = stringResource(R.string.delete))
                                 }
                             }
                         }
@@ -107,55 +115,5 @@ fun TaskScreen(context: Context, navigateToPending: () -> Unit, navigateToComple
                 Text(stringResource(R.string.completed_tasks))
             }
         }
-    }
-
-    if (showDialog) {
-        AlertDialog(
-            onDismissRequest = { showDialog = false },
-            title = { Text(stringResource(R.string.add_task_title)) },
-            text = {
-                Column {
-                    BasicTextField(
-                        value = taskTitle,
-                        onValueChange = { taskTitle = it },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp),
-                        decorationBox = { innerTextField ->
-                            if (taskTitle.isEmpty()) {
-                                Text(stringResource(R.string.task))
-                            }
-                            innerTextField()
-                        }
-                    )
-                }
-            },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        dbHelper.addTask(taskTitle)
-                        tasks = dbHelper.getAllTasks()
-                        taskTitle = ""
-                        showDialog = false
-                    },
-                    enabled = taskTitle.isNotEmpty(),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = azulClarito
-                    )
-                ) {
-                    Text(stringResource(R.string.add))
-                }
-            },
-            dismissButton = {
-                Button(
-                    onClick = { showDialog = false },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = azulClarito
-                    )
-                ) {
-                    Text(stringResource(R.string.cancel))
-                }
-            }
-        )
     }
 }
