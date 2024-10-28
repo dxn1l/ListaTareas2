@@ -6,16 +6,28 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 
-data class Task(val id: Int, val title: String?, val done: Boolean)
+data class Task(
+    val id: Int,
+    val title: String?,
+    val description: String?,
+    val date: String?,
+    val priority: String,
+    val cost: Double,
+    val done: Boolean
+)
 
 class TaskDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
 
     companion object {
-        private const val DATABASE_VERSION = 3
+        private const val DATABASE_VERSION = 4
         private const val DATABASE_NAME = "TaskDatabase.db"
         private const val TABLE_NAME = "tasks"
         private const val COLUMN_ID = "id"
         private const val COLUMN_TITLE = "title"
+        private const val COLUMN_DESCRIPTION = "description"
+        private const val COLUMN_DATE = "date"
+        private const val COLUMN_PRIORITY = "priority"
+        private const val COLUMN_COST = "cost"
         private const val COLUMN_DONE = "done"
     }
 
@@ -23,26 +35,31 @@ class TaskDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
         val createTable = ("CREATE TABLE $TABLE_NAME ("
                 + "$COLUMN_ID INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + "$COLUMN_TITLE TEXT,"
+                + "$COLUMN_DESCRIPTION TEXT,"
+                + "$COLUMN_DATE TEXT,"
+                + "$COLUMN_PRIORITY INTEGER,"
+                + "$COLUMN_COST REAL,"
                 + "$COLUMN_DONE INTEGER DEFAULT 0)")
         db.execSQL(createTable)
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        if (oldVersion < 3) {
-            db.execSQL("CREATE TABLE new_tasks ("
-                    + "$COLUMN_ID INTEGER PRIMARY KEY AUTOINCREMENT,"
-                    + "$COLUMN_TITLE TEXT,"
-                    + "$COLUMN_DONE INTEGER DEFAULT 0)")
-            db.execSQL("INSERT INTO new_tasks ($COLUMN_ID, $COLUMN_TITLE, $COLUMN_DONE) SELECT $COLUMN_ID, $COLUMN_TITLE, $COLUMN_DONE FROM $TABLE_NAME")
-            db.execSQL("DROP TABLE $TABLE_NAME")
-            db.execSQL("ALTER TABLE new_tasks RENAME TO $TABLE_NAME")
+        if (oldVersion < 4) {
+            db.execSQL("ALTER TABLE $TABLE_NAME ADD COLUMN $COLUMN_DESCRIPTION TEXT")
+            db.execSQL("ALTER TABLE $TABLE_NAME ADD COLUMN $COLUMN_DATE TEXT")
+            db.execSQL("ALTER TABLE $TABLE_NAME ADD COLUMN $COLUMN_PRIORITY INTEGER")
+            db.execSQL("ALTER TABLE $TABLE_NAME ADD COLUMN $COLUMN_COST REAL")
         }
     }
 
-    fun addTask(title: String): Long {
+    fun addTask(title: String, description: String, date: String, priority: String, cost: Double): Long {
         val db = this.writableDatabase
         val values = ContentValues().apply {
             put(COLUMN_TITLE, title)
+            put(COLUMN_DESCRIPTION, description)
+            put(COLUMN_DATE, date)
+            put(COLUMN_PRIORITY, priority)
+            put(COLUMN_COST, cost)
         }
         return db.insert(TABLE_NAME, null, values)
     }
@@ -57,6 +74,10 @@ class TaskDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
                 val task = Task(
                     cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ID)),
                     cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TITLE)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_DESCRIPTION)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_DATE)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PRIORITY)),
+                    cursor.getDouble(cursor.getColumnIndexOrThrow(COLUMN_COST)),
                     cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_DONE)) == 1
                 )
                 taskList.add(task)
