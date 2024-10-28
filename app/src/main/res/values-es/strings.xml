@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Lista de Tareas 2</string>
+    <string name="add_task">Añadir Tarea</string>
+    <string name="pending_tasks">Tareas Pendientes</string>
+    <string name="completed_tasks">Tareas Completadas</string>
+    <string name="back_to_task_list">Volver a lista de Tareas</string>
+    <string name="task_list">Lista de Tareas</string>
+    <string name="pending_task_list">Lista de Tareas Pendientes</string>
+    <string name="completed_task_list">Lista de Tareas Completadas</string>
+    <string name="add_task_title">Añadir Tarea</string>
+    <string name="task">Tarea</string>
+    <string name="add">Añadir</string>
+    <string name="cancel">Cancelar</string>
+    <string name="delete">Eliminar</string>
+</resources>

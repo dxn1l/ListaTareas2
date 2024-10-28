@@ -1,3 +1,15 @@
 <resources>
-    <string name="app_name">ListaTareas2</string>
+<string name="app_name">Task List 2</string>
+<string name="add_task">Add Task</string>
+<string name="pending_tasks">Pending Tasks</string>
+<string name="completed_tasks">Completed Tasks</string>
+<string name="back_to_task_list">Back to Task List</string>
+<string name="task_list">Task List</string>
+<string name="pending_task_list">Pending Task List</string>
+<string name="completed_task_list">Completed Task List</string>
+<string name="add_task_title">Add Task</string>
+<string name="task">Task</string>
+<string name="add">Add</string>
+<string name="cancel">Cancel</string>
+<string name="delete">Delete</string>
 </resources>
